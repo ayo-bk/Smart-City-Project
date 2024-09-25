@@ -3,7 +3,6 @@ import { Marker } from "react-native-maps";
 import React, { useState, useEffect } from 'react';
 import { Button, View, Platform, Alert, Dimensions, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 export default function Index() {
   const [region, setRegion] = useState({
@@ -28,21 +27,9 @@ export default function Index() {
   ]);
   
   const getLocation = async () => {
-    // Ask for location permissions
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission to access location was denied');
-      return;
-    }
-
-    // Get the current location
-    const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
-    const { latitude, longitude } = location.coords;
-
-    // Update the map's region to the user's location
     setRegion({
-      latitude,
-      longitude,
+      latitude : 48.866264735797564,
+      longitude : 2.3735929334624166,
       latitudeDelta: 0.015,
       longitudeDelta: 0.0121,
     });
