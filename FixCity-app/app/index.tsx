@@ -1,8 +1,7 @@
 import MapView from "react-native-map-clustering";
 import { Marker } from "react-native-maps";
 import React, { useState, useEffect } from 'react';
-import { Button, View, Platform, Alert, Dimensions, StyleSheet } from 'react-native';
-import * as Location from 'expo-location';
+import { Button, View, Alert, Dimensions, StyleSheet } from 'react-native';
 
 export default function Index() {
   const [region, setRegion] = useState({
@@ -28,8 +27,8 @@ export default function Index() {
   
   const getLocation = async () => {
     setRegion({
-      latitude : 48.866264735797564,
-      longitude : 2.3735929334624166,
+      latitude : 48.85781676584989,
+      longitude : 2.2950763090818325,
       latitudeDelta: 0.015,
       longitudeDelta: 0.0121,
     });
@@ -59,8 +58,6 @@ export default function Index() {
             style={{ width: 26, height: 28 }}
             resizeMode="center"
           /> */}
-
-      <Button title="Go to my location" onPress={getLocation} />
 
       </MapView>
       <View style={styles.buttonContainer}>
