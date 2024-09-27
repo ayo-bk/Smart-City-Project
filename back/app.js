@@ -4,16 +4,16 @@ const mongoose = require("mongoose");
 
 const MongoUrl = "mongodb+srv://mpinaudlatapie:Rqd3ujQwzKxctUYZ@smartcity.xljgv.mongodb.net/"
 
-mongoose.connect(MongoUrl).then(() => {
-    console.log("Connected to MongoDB");
-}).catch((err) => {
-    console.log("Error: ", err);
-});
+const connectDB = async () => {
+  try {
+    await mongoose.connect(MongoUrl)
 
-app.get("/", (req, res) => {
-  res.send({ status: "Started" });
-});
+  console.log('MongoDB Connected...')
+  }
+  catch (err) {
+    console.log(err.message);
+  };
+};
 
-app.listen(5001, () => {
-  console.log("Node js server started.");
-});
+
+module.exports = connectDB
