@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
-  Switch,
-} from "react-native";
+import { View, Text, Modal, TouchableOpacity, Switch } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import {
   TrafficCone,
