@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
   Modal,
   TouchableOpacity,
   Switch,
+  TouchableWithoutFeedback,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import {
@@ -17,6 +18,8 @@ import {
   Bath,
   Lightbulb,
   FireExtinguisher,
+  ImagePlus,
+  Plus,
 } from "lucide-react-native";
 
 type Filter =
@@ -25,6 +28,11 @@ type Filter =
   | "Bouche d'incendie"
   | "Poubelle"
   | "Lumière";
+
+
+
+
+  
 
 export default function Index() {
   const [region, setRegion] = useState({
@@ -49,6 +57,18 @@ export default function Index() {
 
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<Filter[]>([]);
+
+  const [selectedMarker, setSelectedMarker] = useState<null | { id: number; latitude: number; longitude: number }>(null);
+  const [isReportVisible, setIsReportVisible] = useState(false);
+  const profileModalRef = useRef(null);
+
+  const handleProfilePress = () => {
+    setIsReportVisible(true);
+  };
+
+  const handleProfileClose = () => {
+    setIsReportVisible(false);
+  };
 
   const getLocation = async () => {
     setRegion({
@@ -220,8 +240,12 @@ export default function Index() {
               latitude: marker.latitude,
               longitude: marker.longitude,
             }}
-            title="wsh les bggg"
+            title="azeaeazeaeaea"
             description="c'est michou"
+            onPress={() => {
+              setSelectedMarker(marker);
+              setIsReportVisible(true);
+            }}
           >
             <TrafficCone size={30} color="orange" />
           </Marker>
@@ -242,6 +266,83 @@ export default function Index() {
           <LocateFixed size={24} color="black" />
         </TouchableOpacity>
       </View>
+
+
+
+  <Modal
+        ref={profileModalRef}
+        visible={isReportVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={handleProfileClose}
+      >
+        <TouchableWithoutFeedback onPress={handleProfileClose}>
+          <View className="flex-1 bg-transparent">
+
+
+            <TouchableWithoutFeedback>
+              <View className="bg-white rounded-t-3xl absolute bottom-0 left-0 right-0 p-4">
+                
+
+
+                <Text className="text-center text-lg font-semibold mb-6">NOUVEAU SIGNALLEMENT</Text>
+
+
+
+                <View className="flex-row items-center bg-gray-100 p-4 rounded-lg mb-6">
+                  <BusFront size={24} color="black" strokeWidth={2} />
+                  <View className="ml-3">
+                    <Text className="font-semibold">Arrêt de bus</Text>
+                    <Text className="text-blue-500">54 rue Lafontaine</Text>
+                  </View>
+                </View>
+
+
+
+
+                <TouchableOpacity className="flex-row justify-between items-center py-4 border-b border-gray-300">
+                  <Text className="text-lg">Type</Text>
+                  <Plus size={24} color="black" strokeWidth={2} />
+                </TouchableOpacity>
+
+                <TouchableOpacity className="flex-row justify-between items-center py-4 border-b border-gray-300">
+                  <Text className="text-lg">Description</Text>
+                  <Plus size={24} color="black" strokeWidth={2} />
+                </TouchableOpacity>
+
+
+
+                <View className="mt-6">
+                  <Text className="text-lg mb-3">Photo</Text>
+                  <View className="flex-row justify-around">
+                    <TouchableOpacity className="bg-gray-100 p-5 rounded-lg items-center justify-center">
+                    <ImagePlus size={24} color="black" strokeWidth={2} />
+                    </TouchableOpacity>
+                    <TouchableOpacity className="bg-gray-100 p-5 rounded-lg items-center justify-center">
+                    <ImagePlus size={24} color="black" strokeWidth={2} />
+                    </TouchableOpacity>
+                    <TouchableOpacity className="bg-gray-100 p-5 rounded-lg items-center justify-center">
+                    <ImagePlus size={24} color="black" strokeWidth={2} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+
+
+                <TouchableOpacity
+                  onPress={() => {
+                    alert("Merci \n Votre signalement a bien été publié !");
+                    handleProfileClose();
+                  }}
+                  className="bg-blue-500 py-4 rounded-full mt-10 mb-3"
+                >
+                  <Text className="text-center text-white text-lg">Publier</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 }
