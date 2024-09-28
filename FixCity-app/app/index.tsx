@@ -1,21 +1,13 @@
-// import React, { useState, useEffect } from 'react';
-
 import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useHistory } from 'react-router-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 const HelloWorld = () => {
-  const history = useHistory();
-
-  const handleButtonClick = () => {
-    history.push('/map/page.tsx');
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Hello, World! Voilà c'est tout!</Text>
-      <Button title="Go to Other Page" onPress={handleButtonClick} />
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>INSCRIPTION</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -30,6 +22,20 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     color: '#000000', // Couleur du texte
+  },
+  button: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: '#127CFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
