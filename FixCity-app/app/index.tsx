@@ -154,7 +154,7 @@ export default function Index() {
               <View className="bg-white rounded-t-3xl absolute bottom-0 left-0 right-0 p-4">
                 <View className="items-center justify-center mb-7 mt-3">
                   <TouchableOpacity
-                    className="absolute left-0 p-2  bg-blue-500 rounded-full "
+                    className="absolute left-0 p-2 bg-blue-500 rounded-full "
                     onPress={handleProfilePress}
                   >
                     <UserRound size={30} color="white" />
