@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Modal, TouchableOpacity, Switch } from "react-native";
+import { View, Text, Modal, TouchableOpacity, Switch, Button, Image } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import {
   TrafficCone,
@@ -12,6 +12,8 @@ import {
   Lightbulb,
   FireExtinguisher,
 } from "lucide-react-native";
+import * as ImagePicker from 'expo-image-picker';
+
 
 type Filter =
   | "Toilettes"
@@ -21,6 +23,47 @@ type Filter =
   | "Lumière";
 
 export default function Index() {
+  const [image, setImage] = useState<string | null>(null);
+
+  const takeImage = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    
+    if (status !== 'granted') {
+      alert('Veuillez accepter la permission d&apos;utiliser la camera ');
+      return;
+    }
+  
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  
+    console.log(result);
+  
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  const pickImage = async () => {
+    // J'ai pas besoin de permission pour accéder à la galerie
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+
   const [region, setRegion] = useState({
     latitude: 48.85781676584989,
     longitude: 2.2950763090818325,
@@ -183,11 +226,13 @@ export default function Index() {
           </View>
 
           {/* Buttons for Apply and Reset */}
-          <View className="flex-row gap-3 items-center justify-center mt-16">
+          <View className="flex-col gap-3 items-center justify-center mt-16">
+            <View className="flex-row"> 
+            
             <TouchableOpacity
               onPress={handleFilterReset}
               className="w-36 h-10 items-center flex-1 justify-center border-blue-500 rounded-full border"
-            >
+              >
               <Text className="text-center text-xl text-blue-500">
                 Réinitialiser
               </Text>
@@ -195,9 +240,24 @@ export default function Index() {
             <TouchableOpacity
               onPress={handleFilterApply}
               className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full "
-            >
+              >
               <Text className="text-center text-xl text-white">Valider</Text>
             </TouchableOpacity>
+            </View>
+            <View className="flex-row">
+            <TouchableOpacity
+              onPress={pickImage}
+              className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full "
+              >
+              <Text className="text-center text-xl text-white">Choose photo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={takeImage}
+              className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full "
+              >
+              <Text className="text-center text-xl text-white">Take photo</Text>
+            </TouchableOpacity>
+              </View>
           </View>
         </View>
       </Modal>
@@ -239,3 +299,4 @@ export default function Index() {
     </View>
   );
 }
+
