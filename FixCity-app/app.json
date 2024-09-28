@@ -34,6 +34,13 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow FixCty to acces your photo",
+          "cameraPermission" : "Allow FixCty to acces your camera"
+        }
       ]
     ],
     "experiments": {
