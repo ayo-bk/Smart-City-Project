@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
   Modal,
   TouchableOpacity,
   Switch,
+  Button,
+  Image,
+  TouchableWithoutFeedback,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import {
@@ -17,7 +20,9 @@ import {
   Bath,
   Lightbulb,
   FireExtinguisher,
+  UserRound,
 } from "lucide-react-native";
+import * as ImagePicker from "expo-image-picker";
 
 type Filter =
   | "Toilettes"
@@ -27,6 +32,46 @@ type Filter =
   | "Lumière";
 
 export default function Index() {
+  const [image, setImage] = useState<string | null>(null);
+
+  const takeImage = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Veuillez accepter la permission d&apos;utiliser la camera ");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  const pickImage = async () => {
+    // J'ai pas besoin de permission pour accéder à la galerie
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
   const [region, setRegion] = useState({
     latitude: 48.85781676584989,
     longitude: 2.2950763090818325,
@@ -49,6 +94,8 @@ export default function Index() {
 
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<Filter[]>([]);
+  const [isProfileVisible, setIsProfileVisible] = useState(false);
+  const profileModalRef = useRef(null);
 
   const getLocation = async () => {
     setRegion({
@@ -57,6 +104,14 @@ export default function Index() {
       latitudeDelta: 0.015,
       longitudeDelta: 0.0121,
     });
+  };
+
+  const handleProfilePress = () => {
+    setIsProfileVisible(true);
+  };
+
+  const handleProfileClose = () => {
+    setIsProfileVisible(false);
   };
 
   const handleFilterPress = () => {
@@ -86,6 +141,70 @@ export default function Index() {
 
   return (
     <View className="flex-1">
+      <Modal
+        ref={profileModalRef}
+        visible={isProfileVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={handleProfileClose}
+      >
+        <TouchableWithoutFeedback onPress={handleProfileClose}>
+          <View className="flex-1 bg-transparent">
+            <TouchableWithoutFeedback>
+              <View className="bg-white rounded-t-3xl absolute bottom-0 left-0 right-0 p-4">
+                <View className="items-center justify-center mb-7 mt-3">
+                  <TouchableOpacity
+                    className="absolute left-0 p-2  bg-blue-500 rounded-full "
+                    onPress={handleProfilePress}
+                  >
+                    <UserRound size={30} color="white" />
+                  </TouchableOpacity>
+                  <Text className="text-2xl font-bold">Roxanne Thiemmen</Text>
+                </View>
+                <View className="mb-4">
+                  <Text className="font-bold text-lg">Mes Signalements</Text>
+                </View>
+                {/* Signalement 1 */}
+                <View className="bg-gray-200 p-1 rounded-3xl mb-3 items-center flex-row gap-2">
+                  <View className="items-center">
+                    <BusFront size={34} color="black" strokeWidth={1.5} />
+                  </View>
+                  <View className="">
+                    <Text className="font-bold">Arrêt de bus</Text>
+                    <Text className="text-blue-500">54 rue Lafontaine</Text>
+                    <Text className="italic text-sm ">
+                      "La vitre de l'abribus est cassée."
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Signalement 2 */}
+                <View className="bg-gray-100 p-4 rounded-lg mb-3">
+                  <View className="flex-row items-center mb-2">
+                    <TrafficCone size={24} color="black" />
+                    <Text className="ml-2 font-bold">Voierie</Text>
+                  </View>
+                  <Text className="text-gray-600">38 rue Waldeck Rousseau</Text>
+                  <Text className="text-gray-600">
+                    "Il manque beaucoup de pavés sur les trottoirs. C'est
+                    dangereux pour les talons aiguilles."
+                  </Text>
+                </View>
+
+                {/* Signalement 3 */}
+                <View className="bg-gray-100 p-4 rounded-lg mb-3">
+                  <View className="flex-row items-center mb-2">
+                    <Bath size={24} color="black" />
+                    <Text className="ml-2 font-bold">Toilettes</Text>
+                  </View>
+                  <Text className="text-gray-600">52 avenue de la Marne</Text>
+                  <Text className="text-gray-600">"À déboucher."</Text>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
       <Modal
         visible={isFilterVisible}
         animationType="slide"
@@ -189,21 +308,41 @@ export default function Index() {
           </View>
 
           {/* Buttons for Apply and Reset */}
-          <View className="flex-row gap-3 items-center justify-center mt-16">
-            <TouchableOpacity
-              onPress={handleFilterReset}
-              className="w-36 h-10 items-center flex-1 justify-center border-blue-500 rounded-full border"
-            >
-              <Text className="text-center text-xl text-blue-500">
-                Réinitialiser
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleFilterApply}
-              className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full "
-            >
-              <Text className="text-center text-xl text-white">Valider</Text>
-            </TouchableOpacity>
+          <View className="flex-col gap-3 items-center justify-center mt-16">
+            <View className="flex-row">
+              <TouchableOpacity
+                onPress={handleFilterReset}
+                className="w-36 h-10 items-center flex-1 justify-center border-blue-500 rounded-full border"
+              >
+                <Text className="text-center text-xl text-blue-500">
+                  Réinitialiser
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleFilterApply}
+                className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full "
+              >
+                <Text className="text-center text-xl text-white">Valider</Text>
+              </TouchableOpacity>
+            </View>
+            <View className="flex-row">
+              <TouchableOpacity
+                onPress={pickImage}
+                className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full "
+              >
+                <Text className="text-center text-xl text-white">
+                  Choose photo
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={takeImage}
+                className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full "
+              >
+                <Text className="text-center text-xl text-white">
+                  Take photo
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -227,21 +366,25 @@ export default function Index() {
           </Marker>
         ))}
       </MapView>
-      <View className="absolute bottom-10 right-5 flex-col ">
-        <TouchableOpacity
-          className="p-5 bg-white rounded-full items-center mb-3 justify-center "
-          onPress={handleFilterPress}
-        >
-          <SlidersHorizontal size={24} color="black" />
-        </TouchableOpacity>
+      <TouchableOpacity
+        className="absolute top-20 right-5 p-3 bg-blue-500 rounded-full items-center"
+        onPress={handleProfilePress}
+      >
+        <UserRound size={24} color="white" />
+      </TouchableOpacity>
+      <TouchableOpacity
+        className=" absolute bottom-32 right-5 p-4 bg-white rounded-full items-center justify-center mb-2"
+        onPress={handleFilterPress}
+      >
+        <SlidersHorizontal size={24} color="black" />
+      </TouchableOpacity>
 
-        <TouchableOpacity
-          className="p-5 bg-white rounded-full items-center mb-10 justify-center "
-          onPress={getLocation}
-        >
-          <LocateFixed size={24} color="black" />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        className=" absolute bottom-16 right-5 p-4 bg-white rounded-full items-center justify-center "
+        onPress={getLocation}
+      >
+        <LocateFixed size={24} color="black" />
+      </TouchableOpacity>
     </View>
   );
 }
