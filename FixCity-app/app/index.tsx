@@ -36,7 +36,8 @@ export default function Index() {
   const [image, setImage] = useState<string | null>(null);
 
   // URL de l'API backend
-  const BACKEND_URL = 'http://192.168.1.89:3000'
+  const BACKEND_URL = "http://192.168.1.89:3000";
+
 
   // ABRIS
   // Définir l'interface pour le type de données des abris
@@ -57,10 +58,11 @@ export default function Index() {
     }
   };
 
-   // Récupérer les abris au chargement du composant
-   useEffect(() => {
+  // Récupérer les abris au chargement du composant
+  useEffect(() => {
     fetchAbris();
   }, []);
+
 
   // BANCS-POUBELLES
   // Définir l'interface pour le type de données des bancs-poubelles
@@ -77,14 +79,18 @@ export default function Index() {
       const response = await axios.get(`${BACKEND_URL}/bench_trash`);
       setBenchTrash(response.data.data);
     } catch (error) {
-      console.error("Erreur lors de la récupération des bancs-poubelles:", error);
+      console.error(
+        "Erreur lors de la récupération des bancs-poubelles:",
+        error
+      );
     }
   };
 
-   // Récupérer les bancs-poubelles au chargement du composant
-   useEffect(() => {
+  // Récupérer les bancs-poubelles au chargement du composant
+  useEffect(() => {
     fetchBenchTrash();
   }, []);
+
 
   // BOUCHES D'INCENDIE
   // Définir l'interface pour le type de données des bouches d'incendie
@@ -103,20 +109,24 @@ export default function Index() {
       const response = await axios.get(`${BACKEND_URL}/fire_hydratants`);
       setFireHydrants(response.data.data);
     } catch (error) {
-      console.error("Erreur lors de la récupération des bouches d'incendie:", error);
+      console.error(
+        "Erreur lors de la récupération des bouches d'incendie:",
+        error
+      );
     }
   };
 
-   // Récupérer les bouches d'incendie au chargement du composant
-   useEffect(() => {
+  // Récupérer les bouches d'incendie au chargement du composant
+  useEffect(() => {
     fetchFireHydrants();
   }, []);
+
 
   // LUMIÈRES
   // Définir l'interface pour le type de données des lumières
   interface Light {
     "Libellé de la famille de luminaire": string;
-    geo_point_2d: string;  // Coordonnées sous forme de chaîne "latitude,longitude"
+    geo_point_2d: string; // Coordonnées sous forme de chaîne "latitude,longitude"
   }
 
   const [lights, setLights] = useState<Light[]>([]);
@@ -131,10 +141,11 @@ export default function Index() {
     }
   };
 
-   // Récupérer les lumières au chargement du composant
-   useEffect(() => {
+  // Récupérer les lumières au chargement du composant
+  useEffect(() => {
     fetchLights();
   }, []);
+
 
   // TOILETTES
   // Définir l'interface pour le type de données des toilettes
@@ -156,8 +167,8 @@ export default function Index() {
     }
   };
 
-   // Récupérer les toilettes au chargement du composant
-   useEffect(() => {
+  // Récupérer les toilettes au chargement du composant
+  useEffect(() => {
     fetchToilets();
   }, []);
 
@@ -220,7 +231,16 @@ export default function Index() {
   ]);
 
   const [isFilterVisible, setIsFilterVisible] = useState(false);
-  const [selectedFilters, setSelectedFilters] = useState<Filter[]>([]);
+  // const [selectedFilters, setSelectedFilters] = useState<Filter[]>([]);
+
+  const [selectedFilters, setSelectedFilters] = useState({
+    toilets: false,
+    bench_trash: false,
+    fire_hydratants: false,
+    lights: false,
+    abris: false,
+  });
+
   const [isProfileVisible, setIsProfileVisible] = useState(false);
   const profileModalRef = useRef(null);
 
@@ -249,12 +269,26 @@ export default function Index() {
     setIsFilterVisible(false);
   };
 
-  const handleFilterChange = (filter: Filter, isSelected: boolean) => {
-    if (isSelected) {
-      setSelectedFilters([...selectedFilters, filter]);
-    } else {
-      setSelectedFilters(selectedFilters.filter((item) => item !== filter));
-    }
+  // const handleFilterChange = (filter: Filter, isSelected: boolean) => {
+  //   if (isSelected) {
+  //     setSelectedFilters([...selectedFilters, filter]);
+  //   } else {
+  //     setSelectedFilters(selectedFilters.filter((item) => item !== filter));
+  //   }
+  // };
+
+  type FilterName =
+    | "toilets"
+    | "bench_trash"
+    | "fire_hydratants"
+    | "lights"
+    | "abris";
+
+  const handleFilterChange = (filterName: FilterName) => {
+    setSelectedFilters((prevFilters) => ({
+      ...prevFilters,
+      [filterName]: !prevFilters[filterName],
+    }));
   };
 
   const handleFilterApply = () => {
@@ -263,7 +297,60 @@ export default function Index() {
   };
 
   const handleFilterReset = () => {
-    setSelectedFilters([]);
+    setSelectedFilters({
+      toilets: false,
+      bench_trash: false,
+      fire_hydratants: false,
+      lights: false,
+      abris: false,
+    });
+  };
+
+  const fetchFilteredData = async () => {
+    try {
+      let toiletsData = [];
+      let benchTrashData = [];
+      let fireHydrantData = [];
+      let lightsData = [];
+      let abrisData = [];
+
+      if (selectedFilters.toilets) {
+        const response = await axios.get(`${BACKEND_URL}/toilets`);
+        toiletsData = response.data.data;
+      }
+
+      if (selectedFilters.bench_trash) {
+        const response = await axios.get(`${BACKEND_URL}/bench_trash`);
+        benchTrashData = response.data.data;
+      }
+
+      if (selectedFilters.fire_hydratants) {
+        const response = await axios.get(`${BACKEND_URL}/fire_hydratants`);
+        fireHydrantData = response.data.data;
+      }
+
+      if (selectedFilters.lights) {
+        const response = await axios.get(`${BACKEND_URL}/lights`);
+        lightsData = response.data.data;
+      }
+
+      if (selectedFilters.abris) {
+        const response = await axios.get(`${BACKEND_URL}/abris`);
+        abrisData = response.data.data;
+      }
+
+      // Combiner toutes les données récupérées
+      setToilets(toiletsData);
+      setBenchTrash(benchTrashData);
+      setFireHydrants(fireHydrantData);
+      setLights(lightsData);
+      setAbris(abrisData);
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des données filtrées :",
+        error
+      );
+    }
   };
 
   return (
@@ -338,7 +425,7 @@ export default function Index() {
         transparent={true}
         onRequestClose={handleFilterClose}
       >
-        <View className="bg-white flex-1 py-14 px-10 ">
+        <View className="bg-white flex-1 py-14 px-10">
           <View className="mb-4">
             <TouchableOpacity onPress={handleFilterClose}>
               <ArrowLeft size={24} color="black" />
@@ -347,6 +434,7 @@ export default function Index() {
               Filtrer les éléments affichés
             </Text>
           </View>
+
           <View className="flex gap-4 mt-5">
             {/* Toilettes */}
             <View className="flex-row items-center justify-between mb-4">
@@ -356,10 +444,8 @@ export default function Index() {
               </View>
               <View>
                 <Switch
-                  value={selectedFilters.includes("Toilettes")}
-                  onValueChange={(value) =>
-                    handleFilterChange("Toilettes", value)
-                  }
+                  value={selectedFilters.toilets}
+                  onValueChange={() => handleFilterChange("toilets")}
                   trackColor={{ false: "#FFFFFF", true: "#127CFF" }}
                 />
               </View>
@@ -373,10 +459,8 @@ export default function Index() {
               </View>
               <View>
                 <Switch
-                  value={selectedFilters.includes("Arrêts de bus")}
-                  onValueChange={(value) =>
-                    handleFilterChange("Arrêts de bus", value)
-                  }
+                  value={selectedFilters.abris}
+                  onValueChange={() => handleFilterChange("abris")}
                   trackColor={{ false: "#FFFFFF", true: "#127CFF" }}
                 />
               </View>
@@ -390,10 +474,8 @@ export default function Index() {
               </View>
               <View>
                 <Switch
-                  value={selectedFilters.includes("Bouche d'incendie")}
-                  onValueChange={(value) =>
-                    handleFilterChange("Bouche d'incendie", value)
-                  }
+                  value={selectedFilters.fire_hydratants}
+                  onValueChange={() => handleFilterChange("fire_hydratants")}
                   trackColor={{ false: "#FFFFFF", true: "#127CFF" }}
                 />
               </View>
@@ -407,10 +489,8 @@ export default function Index() {
               </View>
               <View>
                 <Switch
-                  value={selectedFilters.includes("Poubelle")}
-                  onValueChange={(value) =>
-                    handleFilterChange("Poubelle", value)
-                  }
+                  value={selectedFilters.bench_trash}
+                  onValueChange={() => handleFilterChange("bench_trash")}
                   trackColor={{ false: "#FFFFFF", true: "#127CFF" }}
                 />
               </View>
@@ -424,10 +504,8 @@ export default function Index() {
               </View>
               <View>
                 <Switch
-                  value={selectedFilters.includes("Lumière")}
-                  onValueChange={(value) =>
-                    handleFilterChange("Lumière", value)
-                  }
+                  value={selectedFilters.lights}
+                  onValueChange={() => handleFilterChange("lights")}
                   trackColor={{ false: "#FFFFFF", true: "#127CFF" }}
                 />
               </View>
@@ -447,7 +525,7 @@ export default function Index() {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleFilterApply}
-                className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full "
+                className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full"
               >
                 <Text className="text-center text-xl text-white">Valider</Text>
               </TouchableOpacity>
@@ -455,7 +533,7 @@ export default function Index() {
             <View className="flex-row">
               <TouchableOpacity
                 onPress={pickImage}
-                className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full "
+                className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full"
               >
                 <Text className="text-center text-xl text-white">
                   Choose photo
@@ -463,7 +541,7 @@ export default function Index() {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={takeImage}
-                className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full "
+                className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full"
               >
                 <Text className="text-center text-xl text-white">
                   Take photo
@@ -479,82 +557,85 @@ export default function Index() {
         region={region}
         onRegionChangeComplete={setRegion}
       >
-
         {/* Arrêts de bus */}
-        {abris.map((abri, index) => (
-          <Marker
-            key={index}
-            coordinate={{
-              latitude: parseFloat(abri.geo_point_2d.split(',')[0]),
-              longitude: parseFloat(abri.geo_point_2d.split(',')[1]),
-            }}
-            title={abri.LIB_LEVEL}
-            description="Abribus"
-          >
-            <BusFront size={30} color="grey" strokeWidth={2}/>
-          </Marker>
-        ))}
+        {selectedFilters.abris &&
+          abris.map((abri, index) => (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: parseFloat(abri.geo_point_2d.split(",")[0]),
+                longitude: parseFloat(abri.geo_point_2d.split(",")[1]),
+              }}
+              title={abri.LIB_LEVEL}
+              description="Abribus"
+            >
+              <BusFront size={30} color="blue" />
+            </Marker>
+          ))}
 
         {/* Poubelles et bancs */}
-        {benchTrash.map((item, index) => (
-          <Marker
-            key={index}
-            coordinate={{
-              latitude: parseFloat(item.geo_point_2d.split(',')[0]),
-              longitude: parseFloat(item.geo_point_2d.split(',')[1]),
-            }}
-            title={item.LIB_LEVEL}
-            description="Poubelle"
-          >
-            <Trash size={30} color="gray" />
-          </Marker>
-        ))}
+        {selectedFilters.bench_trash &&
+          benchTrash.map((item, index) => (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: parseFloat(item.geo_point_2d.split(",")[0]),
+                longitude: parseFloat(item.geo_point_2d.split(",")[1]),
+              }}
+              title={item.LIB_LEVEL}
+              description="Banc ou poubelle"
+            >
+              <Trash size={30} color="gray" />
+            </Marker>
+          ))}
 
         {/* Bouche d'incendie */}
-        {fireHydrants.map((hydrant, index) => (
-          <Marker
-            key={index}
-            coordinate={{
-              latitude: parseFloat(hydrant["Geo Point"].split(',')[0]),
-              longitude: parseFloat(hydrant["Geo Point"].split(',')[1]),
-            }}
-            title={hydrant.object_name}
-            description={hydrant.Type}
-          >
-            <FireExtinguisher size={30} color="red" />
-          </Marker>
-        ))}
+        {selectedFilters.fire_hydratants &&
+          fireHydrants.map((hydrant, index) => (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: parseFloat(hydrant["Geo Point"].split(",")[0]),
+                longitude: parseFloat(hydrant["Geo Point"].split(",")[1]),
+              }}
+              title={hydrant.object_name}
+              description={hydrant.Type}
+            >
+              <FireExtinguisher size={30} color="red" />
+            </Marker>
+          ))}
 
         {/* Lumières */}
-        {lights.map((light, index) => (
-          <Marker
-            key={index}
-            coordinate={{
-              latitude: parseFloat(light.geo_point_2d.split(',')[0]),
-              longitude: parseFloat(light.geo_point_2d.split(',')[1]),
-            }}
-            title={light["Libellé de la famille de luminaire"]}
-            description="Lumière"
-          >
-            <Lightbulb size={30} color="yellow" />
-          </Marker>
-        ))}
+        {selectedFilters.lights &&
+          lights.map((light, index) => (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: parseFloat(light.geo_point_2d.split(",")[0]),
+                longitude: parseFloat(light.geo_point_2d.split(",")[1]),
+              }}
+              title={light["Libellé de la famille de luminaire"]}
+              description="Luminaire public"
+            >
+              <Lightbulb size={30} color="yellow" />
+            </Marker>
+          ))}
 
         {/* Toilettes */}
-        {toilets.map((toilet, index) => (
-          <Marker
-            key={index}
-            coordinate={{
-              latitude: parseFloat(toilet.geo_point_2d.split(',')[0]),
-              longitude: parseFloat(toilet.geo_point_2d.split(',')[1]),
-            }}
-            title={toilet.Type}
-            description={`Accès PMR : ${toilet.ACCES_PMR}`}
-          >
-            <Bath size={30} color="blue" />
-          </Marker>
-        ))}
-
+        {selectedFilters.toilets &&
+          toilets.map((toilet, index) => (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: parseFloat(toilet.geo_point_2d.split(",")[0]),
+                longitude: parseFloat(toilet.geo_point_2d.split(",")[1]),
+              }}
+              title={toilet.Type}
+              description={`Accès PMR : ${toilet.ACCES_PMR}`}
+            >
+              <Bath size={30} color="blue" />
+            </Marker>
+          ))}
       </MapView>
       <TouchableOpacity
         className="absolute top-20 right-5 p-3 bg-blue-500 rounded-full items-center"
