@@ -834,8 +834,8 @@ export default function Index() {
                   {/* Bouton pour publier le signalement */}
                   <TouchableOpacity
                     onPress={() => {
-                      Alert.alert("Merci", "Votre signalement a bien été publié !");
                       handleSubmit(); // Appelle la fonction pour fermer et réinitialiser la modale
+                      setIsReportVisible(false);
                     }}
                     className="bg-blue-500 py-4 rounded-full mt-10 mb-3"
                   >
