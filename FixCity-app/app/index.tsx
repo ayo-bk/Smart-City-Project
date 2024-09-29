@@ -1,17 +1,26 @@
 import React, { useEffect, useState, useRef } from "react";
+import RNPickerSelect from "react-native-picker-select";
 import {
   View,
-  Text,
-  Modal,
-  TouchableOpacity,
-  Switch,
   Button,
+  Text,
+  Modal as NativeModal,  // Alias pour éviter les conflits
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform, 
+  ScrollView,
+  TextInput,
   Image,
+  Alert,
+  Switch,
   TouchableWithoutFeedback,
+  Modal,
+  Keyboard,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import {
   TrafficCone,
+  UserRound,
   SlidersHorizontal,
   LocateFixed,
   BusFront,
@@ -20,7 +29,10 @@ import {
   Bath,
   Lightbulb,
   FireExtinguisher,
-  UserRound,
+  ImagePlus,
+  Plus,
+  SquareArrowOutUpRight,
+  Aperture ,
 } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
@@ -33,7 +45,6 @@ type Filter =
   | "Lumière";
 
 export default function Index() {
-  const [image, setImage] = useState<string | null>(null);
 
   // URL de l'API backend
   const BACKEND_URL = "http://192.168.1.89:3000";
@@ -172,11 +183,62 @@ export default function Index() {
     fetchToilets();
   }, []);
 
+  // const [isFilterVisible, setIsFilterVisible] = useState(false); // Mathis qui a mis ça en com (venant de Sacha)
+  // const [selectedFilters, setSelectedFilters] = useState<Filter[]>([]); // Mathis qui a mis ça en com (venant de Sacha)
+
+  const [isTypeModalVisible, setIsTypeModalVisible] = useState(false);
+  const [selectedMarker, setSelectedMarker] = useState<null | { id: number; latitude: number; longitude: number }>(null);
+
+  const [isReportVisible, setIsReportVisible] = useState(false);
+  const [isPhotoModalVisible, setIsPhotoModalVisible] = useState(false); // Modale pour les options photo
+  const [image, setImage] = useState<string | null>(null);    
+  const [images, setImages] = useState<string[]>([]); // Tableau pour stocker plusieurs images
+
+
+  // const profileModalRef = useRef(null); // Mathis qui a mis ça en com (venant de Sacha)
+  const [isModalVisible, setIsModalVisible] = useState(true);
+
+  const handleTypeSelect = (value: string) => setSelectedType(value);
+  const handleTypePress = () => setIsTypeModalVisible(true);
+  const handleTypeClose = () => setIsTypeModalVisible(false);
+  
+    // Gestion de la modal de signalement
+  // const handleProfilePress = () => setIsReportVisible(true); // Mathis qui a mis ça en com (venant de Sacha)
+      
+  const handleBackToReport = () => {
+    setIsPhotoModalVisible(false);  // Fermer la modale de photos
+    setIsReportVisible(true);       // Réouvrir la modale de signalement
+  };
+  
+  // États pour gérer les champs type et description
+  const [selectedType, setSelectedType] = useState<string | null>(null); // Pour le type
+  const [description, setDescription] = useState<string>(''); // Pour la description
+
+  // Fonction pour réinitialiser les champs après la publication
+  const resetForm = () => {
+    setSelectedType(null); // Réinitialiser le type
+    setDescription(''); // Réinitialiser la description
+    setImages([]); // Réinitialiser les images
+  };
+
+  const handleProfileClose = () => {
+    setIsReportVisible(false);
+    setImages([]); // Réinitialiser les images
+    resetForm(); // Réinitialiser les champs après la fermeture ou la validation
+    // Réinitialiser d'autres champs si nécessaire
+  };
+
+  // Fonction de publication du signalement
+  const handleSubmit = () => {
+    Alert.alert("Merci", "Votre signalement a bien été publié !");
+    handleProfileClose(); // Fermer la modale et réinitialiser les champs
+  };
+
+  // Fonction pour prendre une photo
   const takeImage = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-
-    if (status !== "granted") {
-      alert("Veuillez accepter la permission d&apos;utiliser la camera ");
+    if (status !== 'granted') {
+      alert("Veuillez accepter la permission d'utiliser la caméra.");
       return;
     }
 
@@ -187,15 +249,15 @@ export default function Index() {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setImages([...images, result.assets[0].uri]); // Ajoute l'image au tableau
+      setIsPhotoModalVisible(false); // Fermer la modale de photo
+      setIsReportVisible(true); // Réouvrir la modale de signalement
     }
   };
 
+  // Fonction pour choisir une image dans la galerie
   const pickImage = async () => {
-    // J'ai pas besoin de permission pour accéder à la galerie
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -203,10 +265,10 @@ export default function Index() {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setImages([...images, result.assets[0].uri]); // Ajoute l'image au tableau
+      setIsPhotoModalVisible(false); // Fermer la modale de photo
+      setIsReportVisible(true); // Réouvrir la modale de signalement
     }
   };
 
@@ -253,13 +315,18 @@ export default function Index() {
     });
   };
 
+  const handlePhotoPress = () => {
+    setIsReportVisible(false); // Fermer la modale de signalement
+    setIsPhotoModalVisible(true); // Ouvrir la modale pour les photos
+  };
+
   const handleProfilePress = () => {
     setIsProfileVisible(true);
   };
 
-  const handleProfileClose = () => {
-    setIsProfileVisible(false);
-  };
+  // const handleProfileClose = () => { // Mathis qui a mis ça en com (venant de dev de base)
+  //   setIsProfileVisible(false);
+  // };
 
   const handleFilterPress = () => {
     setIsFilterVisible(true);
@@ -354,6 +421,11 @@ export default function Index() {
   };
 
   return (
+    <KeyboardAvoidingView
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    style={{ flex: 1 }}
+  >
+    
     <View className="flex-1">
       {/* ----------------------------------------------------------------------- */}
       {/* Modal Profile */}
@@ -572,6 +644,10 @@ export default function Index() {
               }}
               title={abri.LIB_LEVEL}
               description="Abribus"
+            //   onPress={() => {
+            //   setSelectedMarker(marker);
+            //   setIsReportVisible(true);
+            // }}
             >
               <BusFront size={30} color="blue" />
             </Marker>
@@ -588,6 +664,10 @@ export default function Index() {
               }}
               title={item.LIB_LEVEL}
               description="Banc ou poubelle"
+              //   onPress={() => {
+            //   setSelectedMarker(marker);
+            //   setIsReportVisible(true);
+            // }}
             >
               <Trash size={30} color="gray" />
             </Marker>
@@ -604,6 +684,10 @@ export default function Index() {
               }}
               title={hydrant.object_name}
               description={hydrant.Type}
+              //   onPress={() => {
+            //   setSelectedMarker(marker);
+            //   setIsReportVisible(true);
+            // }}
             >
               <FireExtinguisher size={30} color="red" />
             </Marker>
@@ -620,6 +704,10 @@ export default function Index() {
               }}
               title={light["Libellé de la famille de luminaire"]}
               description="Luminaire public"
+            //     onPress={() => {
+            //   setSelectedMarker(marker);
+            //   setIsReportVisible(true);
+            // }}
             >
               <Lightbulb size={30} color="yellow" />
             </Marker>
@@ -636,6 +724,10 @@ export default function Index() {
               }}
               title={toilet.Type}
               description={`Accès PMR : ${toilet.ACCES_PMR}`}
+              //   onPress={() => {
+            //   setSelectedMarker(marker);
+            //   setIsReportVisible(true);
+            // }}
             >
               <Bath size={30} color="blue" />
             </Marker>
@@ -666,5 +758,149 @@ export default function Index() {
         <LocateFixed size={24} color="black" />
       </TouchableOpacity>
     </View>
+    <Modal
+        ref={profileModalRef}
+        visible={isReportVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setIsReportVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          {/* Première couche: Clic sur la zone transparente pour fermer la modale */}
+          <TouchableWithoutFeedback onPress={handleProfileClose}>
+            <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+              {/* Deuxième couche: Contenu de la modale */}
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+                <View className="bg-white rounded-t-3xl p-4">
+                  <Text className="text-center text-lg font-semibold mb-6">
+                    NOUVEAU SIGNALLEMENT
+                  </Text>
+
+                  {/* Détails du signalement */}
+                  <View className="flex-row items-center bg-gray-100 p-4 rounded-lg mb-6">
+                    <BusFront size={24} color="black" strokeWidth={2} />
+                    <View className="ml-3">
+                      <Text className="font-semibold">Arrêt de bus</Text>
+                      <Text className="text-blue-500">54 rue Lafontaine</Text>
+                    </View>
+                  </View>
+
+                  {/* Sélection du type */}
+                  <TouchableOpacity
+                    className="flex-row justify-between items-center py-4 border-b border-gray-300"
+                    onPress={handleTypePress}
+                  >
+                    <RNPickerSelect
+                      onValueChange={(value) => setSelectedType(value)} // Utilise setSelectedType
+                      placeholder={{ label: "Sélectionner un type...", value: null }}
+                      value={selectedType} // Ajoute la valeur sélectionnée ici
+                      items={[
+                        { label: "Vitre cassée", value: "Vitre cassée" },
+                        { label: "Panneau d’affichage", value: "Panneau d’affichage" },
+                        { label: "Banc inutilisable", value: "Banc inutilisable" },
+                      ]}
+                      style={{
+                        inputIOS: {
+                          fontSize: 18,
+                        },
+                      }}
+                    />
+                    <Plus size={24} color="black" strokeWidth={2} />
+                  </TouchableOpacity>
+
+                  {/* Champ de texte pour la description */}
+                  <View className="flex-row justify-between items-center py-4 border-b border-gray-300">
+                    <TextInput
+                      style={{
+                        fontSize: 18,
+                        flex: 1, // Remplir l'espace disponible
+                      }}
+                      multiline
+                      numberOfLines={4}
+                      onChangeText={(text) => setDescription(text)}
+                      placeholder="Ajouter une description ici"
+                      placeholderTextColor="rgba(0, 0, 0, 0.2)" // Définit la couleur du placeholder en gris
+
+                      value={description} // Ajoute la valeur ici
+                      onSubmitEditing={Keyboard.dismiss}
+                    />
+                    <Plus size={24} color="black" strokeWidth={2} />
+                  </View>
+
+
+                   {/* Section pour l'ajout de photos */}
+                  <View className="mt-6">
+                    <Text className="text-lg mb-3">Photo</Text>
+                    
+                    <View className="flex-row justify-around">
+                      {/* Afficher les images sélectionnées */}
+                      {images.map((img, index) => (
+                        <Image key={index} source={{ uri: img }} style={{ width: 60, height: 60 }} />
+                      ))}
+
+                      {/* Afficher les carrés gris restants */}
+                      {[...Array(3 - images.length)].map((_, index) => (
+                        <TouchableOpacity key={index} onPress={handlePhotoPress} className="bg-gray-100 p-5 rounded-lg items-center justify-center">
+                          <ImagePlus size={24} color="black" strokeWidth={2} />
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+
+
+                  {/* Bouton pour publier le signalement */}
+                  <TouchableOpacity
+                    onPress={() => {
+                      Alert.alert("Merci", "Votre signalement a bien été publié !");
+                      handleSubmit(); // Appelle la fonction pour fermer et réinitialiser la modale
+                    }}
+                    className="bg-blue-500 py-4 rounded-full mt-10 mb-3"
+                  >
+                    <Text className="text-center text-white text-lg">Publier</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </Modal>
+      <Modal
+        visible={isPhotoModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setIsPhotoModalVisible(false)}
+      >
+        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <View style={{ backgroundColor: 'white', padding: 20, borderTopLeftRadius: 20, borderTopRightRadius: 20, height: '40%' }}>
+            <TouchableOpacity onPress={handleBackToReport}>
+              <ArrowLeft size={24} color="black" />
+            </TouchableOpacity>
+            <Text className="text-center text-lg font-semibold mb-6">PHOTO</Text>
+
+            {/* Option pour ouvrir la galerie */}
+            <TouchableOpacity
+              onPress={pickImage}
+              className="flex-row items-center py-4 bg-gray-100 rounded-lg mb-3 px-3"
+            >
+              <SquareArrowOutUpRight size={24} color="black" strokeWidth={2} />
+              <Text className="text-lg ml-3">Ouvrir depuis la Galerie</Text>
+            </TouchableOpacity>
+
+            {/* Option pour prendre une photo */}
+            <TouchableOpacity
+              onPress={takeImage}
+              className="flex-row items-center py-4 bg-gray-100 rounded-lg px-3"
+            >
+              <Aperture size={24} color="black" strokeWidth={2} />
+              <Text className="text-lg ml-3">Prendre une photo</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+    </KeyboardAvoidingView>
   );
 }
