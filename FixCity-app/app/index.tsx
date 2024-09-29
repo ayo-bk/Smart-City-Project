@@ -355,6 +355,8 @@ export default function Index() {
 
   return (
     <View className="flex-1">
+      {/* ----------------------------------------------------------------------- */}
+      {/* Modal Profile */}
       <Modal
         ref={profileModalRef}
         visible={isProfileVisible}
@@ -419,6 +421,8 @@ export default function Index() {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+      {/* ----------------------------------------------------------------------- */}
+      {/* Modal Filter */}
       <Modal
         visible={isFilterVisible}
         animationType="slide"
@@ -511,8 +515,8 @@ export default function Index() {
               </View>
             </View>
           </View>
-
-          {/* Buttons for Apply and Reset */}
+          {/* ----------------------------------------------------------------------- */}
+          {/* Boutons Réinitialiser et Valider  */}
           <View className="flex-col gap-3 items-center justify-center mt-16">
             <View className="flex-row">
               <TouchableOpacity
@@ -637,19 +641,24 @@ export default function Index() {
             </Marker>
           ))}
       </MapView>
+      {/* ----------------------------------------------------------------------- */}
+      {/* Button Profile */}
       <TouchableOpacity
         className="absolute top-20 right-5 p-3 bg-blue-500 rounded-full items-center"
         onPress={handleProfilePress}
       >
         <UserRound size={24} color="white" />
       </TouchableOpacity>
+      {/* ----------------------------------------------------------------------- */}
+      {/* Button Filter */}
       <TouchableOpacity
         className=" absolute bottom-32 right-5 p-4 bg-white rounded-full items-center justify-center mb-2"
         onPress={handleFilterPress}
       >
         <SlidersHorizontal size={24} color="black" />
       </TouchableOpacity>
-
+      {/* ----------------------------------------------------------------------- */}
+      {/* Button Locate */}
       <TouchableOpacity
         className=" absolute bottom-16 right-5 p-4 bg-white rounded-full items-center justify-center "
         onPress={getLocation}
