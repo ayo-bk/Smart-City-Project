@@ -8,6 +8,7 @@ const BenchTrash = require('./model/bench_trash');
 const FireHydratants = require('./model/fire_hydratants');
 const Lights = require('./model/lights');
 const Toilets = require('./model/toilets');
+const Signalement = require('./model/signalement');
 
 connectdB();
 
@@ -78,6 +79,19 @@ app.get('/toilets', async (req, res) => {
         res.status(500).send({ error: 'An error occurred while retrieving Toilets data' });
     }
 });
+
+// Post un signalement
+app.post('/signalement', async (req, res) => {
+    try {
+        const { Type, Description } = req.body;
+        const signalement = new Signalement({ Type, Description });
+        await signalement.save();
+        res.json({ data: signalement, title: 'Signalement' });
+    } catch (error) {
+        console.error('Error creating Signalement:', error);
+        res.status(500).send({ error: 'An error occurred while creating Signalement' });
+    }
+})
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)

@@ -405,9 +405,20 @@ export default function Index() {
   };
 
   // Fonction de publication du signalement
-  const handleSubmit = () => {
-    Alert.alert("Merci", "Votre signalement a bien été publié !");
-    handleProfileClose(); // Fermer la modale et réinitialiser les champs
+  const [Type, setType] = useState<string[]>([]);
+  const [Description, setSignDescription] = useState<string>('');
+
+  const handleSubmit = async() => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/signalement`, {
+        Type,
+        Description,
+      });
+      Alert.alert("Merci", "Votre signalement a bien été publié !");
+      handleProfileClose(); // Fermer la modale et réinitialiser les champs
+    } catch (error) {
+      console.error("Erreur lors de la publication du signalement :", error);
+    }
   };
 
   const handlePhotoPress = () => {
@@ -422,9 +433,6 @@ export default function Index() {
     if (selectedFilters.fire_hydratants) return <FireExtinguisher size={24} color="#B80C09" strokeWidth={2} />;
     if (selectedFilters.lights) return <Lightbulb size={24} color="#DC9E82" strokeWidth={2} />;
     if (selectedFilters.abris) return <BusFront size={24} color="#9B7EDE" strokeWidth={2} />;
-
-    // Icône par défaut si aucun filtre n'est activé
-    return <TrafficCone size={24} color="black" strokeWidth={2} />;
   };
 
   return (
@@ -832,9 +840,9 @@ export default function Index() {
                     onPress={handleTypePress}
                   >
                     <RNPickerSelect
-                      onValueChange={(value) => setSelectedType(value)} // Utilise setSelectedType
+                      onValueChange={setType} // Utilise setSelectedType
                       placeholder={{ label: "Sélectionner un type...", value: null }}
-                      value={selectedType} // Ajoute la valeur sélectionnée ici
+                      value={Type} // Ajoute la valeur sélectionnée ici
                       items={[
                         { label: "Sanitaire délabré", value: "Sanitaire délabré" },
                         { label: "Abris bus cassé", value: "Abris bus cassé" },
@@ -861,13 +869,13 @@ export default function Index() {
                         fontSize: 18,
                         flex: 1, // Remplir l'espace disponible
                       }}
+                      value={Description} // Ajoute la valeur ici
                       multiline
                       numberOfLines={4}
-                      onChangeText={(text) => setDescription(text)}
+                      onChangeText={setSignDescription}
                       placeholder="Ajouter une description ici"
                       placeholderTextColor="rgba(0, 0, 0, 0.2)" // Définit la couleur du placeholder en gris
 
-                      value={description} // Ajoute la valeur ici
                       onSubmitEditing={Keyboard.dismiss}
                     />
                     <Plus size={24} color="black" strokeWidth={2} />
