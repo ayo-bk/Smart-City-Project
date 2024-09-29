@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -23,6 +23,7 @@ import {
   UserRound,
 } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 
 type Filter =
   | "Toilettes"
@@ -33,6 +34,132 @@ type Filter =
 
 export default function Index() {
   const [image, setImage] = useState<string | null>(null);
+
+  // URL de l'API backend
+  const BACKEND_URL = 'http://192.168.1.89:3000'
+
+  // ABRIS
+  // Définir l'interface pour le type de données des abris
+  interface Abri {
+    LIB_LEVEL: string;
+    geo_point_2d: string;
+  }
+
+  const [abris, setAbris] = useState<Abri[]>([]);
+
+  // Fonction pour récupérer les données des abris depuis le backend
+  const fetchAbris = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/abris`);
+      setAbris(response.data.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des abris:", error);
+    }
+  };
+
+   // Récupérer les abris au chargement du composant
+   useEffect(() => {
+    fetchAbris();
+  }, []);
+
+  // BANCS-POUBELLES
+  // Définir l'interface pour le type de données des bancs-poubelles
+  interface BenchTrash {
+    LIB_LEVEL: string;
+    geo_point_2d: string;
+  }
+
+  const [benchTrash, setBenchTrash] = useState<BenchTrash[]>([]);
+
+  // Fonction pour récupérer les données des bancs-poubelles depuis le backend
+  const fetchBenchTrash = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/bench_trash`);
+      setBenchTrash(response.data.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des bancs-poubelles:", error);
+    }
+  };
+
+   // Récupérer les bancs-poubelles au chargement du composant
+   useEffect(() => {
+    fetchBenchTrash();
+  }, []);
+
+  // BOUCHES D'INCENDIE
+  // Définir l'interface pour le type de données des bouches d'incendie
+  interface FireHydrant {
+    OBJECTID: string;
+    object_name: string;
+    Type: string;
+    "Geo Point": string;
+  }
+
+  const [fireHydrants, setFireHydrants] = useState<FireHydrant[]>([]);
+
+  // Fonction pour récupérer les données des bouches d'incendie depuis le backend
+  const fetchFireHydrants = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/fire_hydratants`);
+      setFireHydrants(response.data.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des bouches d'incendie:", error);
+    }
+  };
+
+   // Récupérer les bouches d'incendie au chargement du composant
+   useEffect(() => {
+    fetchFireHydrants();
+  }, []);
+
+  // LUMIÈRES
+  // Définir l'interface pour le type de données des lumières
+  interface Light {
+    "Libellé de la famille de luminaire": string;
+    geo_point_2d: string;  // Coordonnées sous forme de chaîne "latitude,longitude"
+  }
+
+  const [lights, setLights] = useState<Light[]>([]);
+
+  // Fonction pour récupérer les données des lumières depuis le backend
+  const fetchLights = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/lights`);
+      setLights(response.data.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des lumières:", error);
+    }
+  };
+
+   // Récupérer les lumières au chargement du composant
+   useEffect(() => {
+    fetchLights();
+  }, []);
+
+  // TOILETTES
+  // Définir l'interface pour le type de données des toilettes
+  interface Toilet {
+    Type: string;
+    ACCES_PMR: string;
+    geo_point_2d: string;
+  }
+
+  const [toilets, setToilets] = useState<Toilet[]>([]);
+
+  // Fonction pour récupérer les données des toilettes depuis le backend
+  const fetchToilets = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/toilets`);
+      setToilets(response.data.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des toilettes:", error);
+    }
+  };
+
+   // Récupérer les toilettes au chargement du composant
+   useEffect(() => {
+    fetchToilets();
+  }, []);
 
   const takeImage = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -352,19 +479,82 @@ export default function Index() {
         region={region}
         onRegionChangeComplete={setRegion}
       >
-        {location.map((marker) => (
+
+        {/* Arrêts de bus */}
+        {abris.map((abri, index) => (
           <Marker
-            key={marker.id}
+            key={index}
             coordinate={{
-              latitude: marker.latitude,
-              longitude: marker.longitude,
+              latitude: parseFloat(abri.geo_point_2d.split(',')[0]),
+              longitude: parseFloat(abri.geo_point_2d.split(',')[1]),
             }}
-            title="wsh les bggg"
-            description="c'est michou"
+            title={abri.LIB_LEVEL}
+            description="Abribus"
           >
-            <TrafficCone size={30} color="orange" />
+            <BusFront size={30} color="grey" strokeWidth={2}/>
           </Marker>
         ))}
+
+        {/* Poubelles et bancs */}
+        {benchTrash.map((item, index) => (
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: parseFloat(item.geo_point_2d.split(',')[0]),
+              longitude: parseFloat(item.geo_point_2d.split(',')[1]),
+            }}
+            title={item.LIB_LEVEL}
+            description="Poubelle"
+          >
+            <Trash size={30} color="gray" />
+          </Marker>
+        ))}
+
+        {/* Bouche d'incendie */}
+        {fireHydrants.map((hydrant, index) => (
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: parseFloat(hydrant["Geo Point"].split(',')[0]),
+              longitude: parseFloat(hydrant["Geo Point"].split(',')[1]),
+            }}
+            title={hydrant.object_name}
+            description={hydrant.Type}
+          >
+            <FireExtinguisher size={30} color="red" />
+          </Marker>
+        ))}
+
+        {/* Lumières */}
+        {lights.map((light, index) => (
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: parseFloat(light.geo_point_2d.split(',')[0]),
+              longitude: parseFloat(light.geo_point_2d.split(',')[1]),
+            }}
+            title={light["Libellé de la famille de luminaire"]}
+            description="Lumière"
+          >
+            <Lightbulb size={30} color="yellow" />
+          </Marker>
+        ))}
+
+        {/* Toilettes */}
+        {toilets.map((toilet, index) => (
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: parseFloat(toilet.geo_point_2d.split(',')[0]),
+              longitude: parseFloat(toilet.geo_point_2d.split(',')[1]),
+            }}
+            title={toilet.Type}
+            description={`Accès PMR : ${toilet.ACCES_PMR}`}
+          >
+            <Bath size={30} color="blue" />
+          </Marker>
+        ))}
+
       </MapView>
       <TouchableOpacity
         className="absolute top-20 right-5 p-3 bg-blue-500 rounded-full items-center"
