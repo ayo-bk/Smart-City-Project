@@ -31,6 +31,7 @@ import {
   Aperture,
   SquareArrowOutUpRight,
   X,
+  Bath,
 } from "lucide-react-native";
 import RNPickerSelect from 'react-native-picker-select';
 import * as ImagePicker from "expo-image-picker";
@@ -432,16 +433,70 @@ export default function Index() {
       style={{ flex: 1 }}
     >
       <View className="flex-1">
-        {/* Modal du profil (si tu en as un) */}
-        <Modal
-          ref={profileModalRef}
-          visible={isProfileVisible}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={handleProfileClose}
-        >
-          {/* ... Ton code pour la modal du profil ... */}
-        </Modal>
+      <Modal
+        ref={profileModalRef}
+        visible={isProfileVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={handleProfileClose}
+      >
+        <TouchableWithoutFeedback onPress={handleProfileClose}>
+          <View className="flex-1 bg-transparent">
+            <TouchableWithoutFeedback>
+              <View className="bg-white rounded-t-3xl absolute bottom-0 left-0 right-0 p-4">
+                <View className="items-center justify-center mb-7 mt-3">
+                  <TouchableOpacity
+                    className="absolute left-0 p-2 bg-blue-500 rounded-full "
+                    onPress={handleProfilePress}
+                  >
+                    <UserRound size={30} color="white" />
+                  </TouchableOpacity>
+                  <Text className="text-2xl font-bold">Roxanne Thiemmen</Text>
+                </View>
+                <View className="mb-4">
+                  <Text className="font-bold text-lg">Mes Signalements</Text>
+                </View>
+                {/* Signalement 1 */}
+                <View className="bg-gray-200 p-1 rounded-3xl mb-3 items-center flex-row gap-2">
+                  <View className="items-center">
+                    <BusFront size={34} color="black" strokeWidth={1.5} />
+                  </View>
+                  <View className="">
+                    <Text className="font-bold">Arrêt de bus</Text>
+                    <Text className="text-blue-500">54 rue Lafontaine</Text>
+                    <Text className="italic text-sm ">
+                      "La vitre de l'abribus est cassée."
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Signalement 2 */}
+                <View className="bg-gray-100 p-4 rounded-lg mb-3">
+                  <View className="flex-row items-center mb-2">
+                    <TrafficCone size={24} color="black" />
+                    <Text className="ml-2 font-bold">Voierie</Text>
+                  </View>
+                  <Text className="text-gray-600">38 rue Waldeck Rousseau</Text>
+                  <Text className="text-gray-600">
+                    "Il manque beaucoup de pavés sur les trottoirs. C'est
+                    dangereux pour les talons aiguilles."
+                  </Text>
+                </View>
+
+                {/* Signalement 3 */}
+                <View className="bg-gray-100 p-4 rounded-lg mb-3">
+                  <View className="flex-row items-center mb-2">
+                    <Droplet size={24} color="black" />
+                    <Text className="ml-2 font-bold">Toilettes</Text>
+                  </View>
+                  <Text className="text-gray-600">52 avenue de la Marne</Text>
+                  <Text className="text-gray-600">"À déboucher."</Text>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
 
         {/* Modal des filtres */}
         <Modal
@@ -705,6 +760,12 @@ export default function Index() {
               </Marker>
             ))}
         </MapView>
+        <TouchableOpacity
+        className="absolute top-20 right-5 p-3 bg-blue-500 rounded-full items-center"
+        onPress={handleProfilePress}
+      >
+        <UserRound size={24} color="white" />
+      </TouchableOpacity>
 
         {/* Bouton pour ouvrir la modal des filtres */}
         <TouchableOpacity
