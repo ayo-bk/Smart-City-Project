@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-
 import {
   View,
   Text,
@@ -459,46 +458,54 @@ export default function Index() {
                   >
                     <UserRound size={30} color="white" />
                   </TouchableOpacity>
-                  <Text className="text-2xl font-bold">Roxanne Thiemmen</Text>
+                  <Text className="text-2xl ">Roxanne Thiemmen</Text>
                 </View>
                 <View className="mb-4">
-                  <Text className="font-bold text-lg">Mes Signalements</Text>
+                  <Text className="text-lg">MES SIGNALEMENTS</Text>
                 </View>
-                {/* Signalement 1 */}
-                <View className="bg-gray-200 p-1 rounded-3xl mb-3 items-center flex-row gap-2">
+                <View className="flex-col gap-3"> 
+
+                {/* Signalement Arrêt de bus */}
+                <View className="bg-gray-200 p-2 rounded-3xl items-center flex-row gap-2">
                   <View className="items-center">
                     <BusFront size={34} color="black" strokeWidth={1.5} />
                   </View>
-                  <View className="">
+                  <View>
                     <Text className="font-bold">Arrêt de bus</Text>
                     <Text className="text-blue-500">54 rue Lafontaine</Text>
-                    <Text className="italic text-sm ">
+                    <Text className="italic text-sm">
                       "La vitre de l'abribus est cassée."
                     </Text>
                   </View>
                 </View>
 
-                {/* Signalement 2 */}
-                <View className="bg-gray-100 p-4 rounded-lg mb-3">
-                  <View className="flex-row items-center mb-2">
-                    <TrafficCone size={24} color="black" />
-                    <Text className="ml-2 font-bold">Voierie</Text>
+                {/* Signalement voieris */}
+                <View className="bg-gray-200 p-2 rounded-3xl items-center flex-row gap-2">
+                  <View className="items-center">
+                  <TrafficCone size={34} color="black" strokeWidth={1.5} />
                   </View>
-                  <Text className="text-gray-600">38 rue Waldeck Rousseau</Text>
-                  <Text className="text-gray-600">
-                    "Il manque beaucoup de pavés sur les trottoirs. C'est
-                    dangereux pour les talons aiguilles."
-                  </Text>
+                  <View>
+                    <Text className="font-bold">Voierie</Text>
+                    <Text className="text-blue-500">38 rue Waldeck Rousseau</Text>
+                    <Text className="italic text-sm">
+                      "Il manque des pavés sur les trottoirs.{"\n"}C'est dangereux pour les talons aiguilles."
+                    </Text>
+                  </View>
                 </View>
 
-                {/* Signalement 3 */}
-                <View className="bg-gray-100 p-4 rounded-lg mb-3">
-                  <View className="flex-row items-center mb-2">
-                    <Droplet size={24} color="black" />
-                    <Text className="ml-2 font-bold">Toilettes</Text>
+                {/* Signalement toilettes */}
+                <View className="bg-gray-200 p-2 rounded-3xl mb-4 items-center flex-row gap-2">
+                  <View className="items-center">
+                  <Bath size={34} color="black" strokeWidth={1.5} />
                   </View>
-                  <Text className="text-gray-600">52 avenue de la Marne</Text>
-                  <Text className="text-gray-600">"À déboucher."</Text>
+                  <View>
+                    <Text className="font-bold">Toilettes</Text>
+                    <Text className="text-blue-500">52 avenue de la Marne</Text>
+                    <Text className="italic text-sm">
+                    "À déboucher."
+                    </Text>
+                  </View>
+                  </View>
                 </View>
               </View>
             </TouchableWithoutFeedback>
