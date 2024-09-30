@@ -48,7 +48,7 @@ export default function Index() {
   const [image, setImage] = useState<string | null>(null);
 
   // URL de l'API backend
-  const BACKEND_URL = "http://192.168.1.89:3000";
+  const BACKEND_URL = "http://192.168.50.222:3000";
 
 
   // ABRIS
