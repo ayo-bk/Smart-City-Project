@@ -31,8 +31,9 @@ import {
   SquareArrowOutUpRight,
   X,
   Bath,
+  Search,
 } from "lucide-react-native";
-import RNPickerSelect from 'react-native-picker-select';
+import RNPickerSelect from "react-native-picker-select";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { Platform } from "react-native";
@@ -46,10 +47,11 @@ type Filter =
 
 export default function Index() {
   const [image, setImage] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
 
   // URL de l'API backend
   const BACKEND_URL = "http://192.168.50.222:3000";
-
 
   // ABRIS
   // Définir l'interface pour le type de données des abris
@@ -74,7 +76,6 @@ export default function Index() {
   useEffect(() => {
     fetchAbris();
   }, []);
-
 
   // BANCS-POUBELLES
   // Définir l'interface pour le type de données des bancs-poubelles
@@ -102,7 +103,6 @@ export default function Index() {
   useEffect(() => {
     fetchBenchTrash();
   }, []);
-
 
   // BOUCHES D'INCENDIE
   // Définir l'interface pour le type de données des bouches d'incendie
@@ -133,7 +133,6 @@ export default function Index() {
     fetchFireHydrants();
   }, []);
 
-
   // LUMIÈRES
   // Définir l'interface pour le type de données des lumières
   interface Light {
@@ -157,7 +156,6 @@ export default function Index() {
   useEffect(() => {
     fetchLights();
   }, []);
-
 
   // TOILETTES
   // Définir l'interface pour le type de données des toilettes
@@ -185,20 +183,22 @@ export default function Index() {
     fetchToilets();
   }, []);
 
-
   // États liés à la gestion des modales et des filtres
   const [isTypeModalVisible, setIsTypeModalVisible] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState<null | {
     Type: React.JSX.Element;
     description: string;
     LIB_LEVEL: string;
-    geo_point_2d: string; id: number; latitude: number; longitude: number 
-}>(null);
+    geo_point_2d: string;
+    id: number;
+    latitude: number;
+    longitude: number;
+  }>(null);
 
   // États pour gérer les modales et l'image
   const [isReportVisible, setIsReportVisible] = useState(false);
   const [isPhotoModalVisible, setIsPhotoModalVisible] = useState(false); // Modale pour les options photo
-  // supp pour merge const [image, setImage] = useState<string | null>(null);    
+  // supp pour merge const [image, setImage] = useState<string | null>(null);
   const [images, setImages] = useState<string[]>([]); // Tableau pour stocker plusieurs images
 
   // Gestion de la modal de type
@@ -207,25 +207,25 @@ export default function Index() {
   const handleTypeClose = () => setIsTypeModalVisible(false);
 
   const handleBackToReport = () => {
-    setIsPhotoModalVisible(false);  // Fermer la modale de photos
-    setIsReportVisible(true);       // Réouvrir la modale de signalement
+    setIsPhotoModalVisible(false); // Fermer la modale de photos
+    setIsReportVisible(true); // Réouvrir la modale de signalement
   };
 
   // États pour gérer les champs type et description
   const [selectedType, setSelectedType] = useState<string | null>(null); // Pour le type
-  const [description, setDescription] = useState<string>(''); // Pour la description
+  const [description, setDescription] = useState<string>(""); // Pour la description
 
   // Fonction pour réinitialiser les champs après la publication
   const resetForm = () => {
     setSelectedType(null); // Réinitialiser le type
-    setDescription(''); // Réinitialiser la description
+    setDescription(""); // Réinitialiser la description
     setImages([]); // Réinitialiser les images
   };
 
   // Fonction pour prendre une photo
   const takeImage = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
+    if (status !== "granted") {
       alert("Veuillez accepter la permission d'utiliser la caméra.");
       return;
     }
@@ -405,9 +405,9 @@ export default function Index() {
 
   // Fonction de publication du signalement
   const [Type, setType] = useState<string[]>([]);
-  const [Description, setSignDescription] = useState<string>('');
+  const [Description, setSignDescription] = useState<string>("");
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     try {
       const response = await axios.post(`${BACKEND_URL}/signalement`, {
         Type,
@@ -427,11 +427,16 @@ export default function Index() {
 
   // Fonction qui détermine l'icône en fonction des filtres
   const getIconByFilter = () => {
-    if (selectedFilters.toilets) return <Droplet size={24} color="#0ACDFF" strokeWidth={2} />;
-    if (selectedFilters.bench_trash) return <Trash size={24} color="#60AB9A" strokeWidth={2} />;
-    if (selectedFilters.fire_hydratants) return <FireExtinguisher size={24} color="#B80C09" strokeWidth={2} />;
-    if (selectedFilters.lights) return <Lightbulb size={24} color="#DC9E82" strokeWidth={2} />;
-    if (selectedFilters.abris) return <BusFront size={24} color="#9B7EDE" strokeWidth={2} />;
+    if (selectedFilters.toilets)
+      return <Droplet size={24} color="#0ACDFF" strokeWidth={2} />;
+    if (selectedFilters.bench_trash)
+      return <Trash size={24} color="#60AB9A" strokeWidth={2} />;
+    if (selectedFilters.fire_hydratants)
+      return <FireExtinguisher size={24} color="#B80C09" strokeWidth={2} />;
+    if (selectedFilters.lights)
+      return <Lightbulb size={24} color="#DC9E82" strokeWidth={2} />;
+    if (selectedFilters.abris)
+      return <BusFront size={24} color="#9B7EDE" strokeWidth={2} />;
   };
 
   return (
@@ -440,78 +445,84 @@ export default function Index() {
       style={{ flex: 1 }}
     >
       <View className="flex-1">
-      <Modal
-        ref={profileModalRef}
-        visible={isProfileVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={handleProfileClose}
-      >
-        <TouchableWithoutFeedback onPress={handleProfileClose}>
-          <View className="flex-1 bg-transparent">
-            <TouchableWithoutFeedback>
-              <View className="bg-white rounded-t-3xl absolute bottom-0 left-0 right-0 p-4">
-                <View className="items-center justify-center mb-7 mt-3">
-                  <TouchableOpacity
-                    className="absolute left-0 p-2 bg-blue-500 rounded-full "
-                    onPress={handleProfilePress}
-                  >
-                    <UserRound size={30} color="white" />
-                  </TouchableOpacity>
-                  <Text className="text-2xl ">Roxanne Thiemmen</Text>
-                </View>
-                <View className="mb-4">
-                  <Text className="text-lg">MES SIGNALEMENTS</Text>
-                </View>
-                <View className="flex-col gap-3"> 
+        <Modal
+          ref={profileModalRef}
+          visible={isProfileVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={handleProfileClose}
+        >
+          <TouchableWithoutFeedback onPress={handleProfileClose}>
+            <View className="flex-1 bg-transparent">
+              <TouchableWithoutFeedback>
+                <View className="bg-white rounded-t-3xl absolute bottom-0 left-0 right-0 p-4">
+                  <View className="items-center justify-center mb-7 mt-3">
+                    <TouchableOpacity
+                      className="absolute left-0 p-2 bg-blue-500 rounded-full "
+                      onPress={handleProfilePress}
+                    >
+                      <UserRound size={30} color="white" />
+                    </TouchableOpacity>
+                    <Text className="text-2xl ">Roxanne Thiemmen</Text>
+                  </View>
+                  <View className="mb-4">
+                    <Text className="text-lg">MES SIGNALEMENTS</Text>
+                  </View>
+                  <View className="flex-col gap-3">
+                    {/* Signalement Arrêt de bus */}
+                    <View className="bg-gray-200 p-2 rounded-3xl items-center flex-row gap-2">
+                      <View className="items-center">
+                        <BusFront size={34} color="black" strokeWidth={1.5} />
+                      </View>
+                      <View>
+                        <Text className="font-bold">Arrêt de bus</Text>
+                        <Text className="text-blue-500">54 rue Lafontaine</Text>
+                        <Text className="italic text-sm">
+                          "La vitre de l'abribus est cassée."
+                        </Text>
+                      </View>
+                    </View>
 
-                {/* Signalement Arrêt de bus */}
-                <View className="bg-gray-200 p-2 rounded-3xl items-center flex-row gap-2">
-                  <View className="items-center">
-                    <BusFront size={34} color="black" strokeWidth={1.5} />
-                  </View>
-                  <View>
-                    <Text className="font-bold">Arrêt de bus</Text>
-                    <Text className="text-blue-500">54 rue Lafontaine</Text>
-                    <Text className="italic text-sm">
-                      "La vitre de l'abribus est cassée."
-                    </Text>
-                  </View>
-                </View>
+                    {/* Signalement voieris */}
+                    <View className="bg-gray-200 p-2 rounded-3xl items-center flex-row gap-2">
+                      <View className="items-center">
+                        <TrafficCone
+                          size={34}
+                          color="black"
+                          strokeWidth={1.5}
+                        />
+                      </View>
+                      <View>
+                        <Text className="font-bold">Voierie</Text>
+                        <Text className="text-blue-500">
+                          38 rue Waldeck Rousseau
+                        </Text>
+                        <Text className="italic text-sm">
+                          "Il manque des pavés sur les trottoirs.{"\n"}C'est
+                          dangereux pour les talons aiguilles."
+                        </Text>
+                      </View>
+                    </View>
 
-                {/* Signalement voieris */}
-                <View className="bg-gray-200 p-2 rounded-3xl items-center flex-row gap-2">
-                  <View className="items-center">
-                  <TrafficCone size={34} color="black" strokeWidth={1.5} />
-                  </View>
-                  <View>
-                    <Text className="font-bold">Voierie</Text>
-                    <Text className="text-blue-500">38 rue Waldeck Rousseau</Text>
-                    <Text className="italic text-sm">
-                      "Il manque des pavés sur les trottoirs.{"\n"}C'est dangereux pour les talons aiguilles."
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Signalement toilettes */}
-                <View className="bg-gray-200 p-2 rounded-3xl mb-4 items-center flex-row gap-2">
-                  <View className="items-center">
-                  <Bath size={34} color="black" strokeWidth={1.5} />
-                  </View>
-                  <View>
-                    <Text className="font-bold">Toilettes</Text>
-                    <Text className="text-blue-500">52 avenue de la Marne</Text>
-                    <Text className="italic text-sm">
-                    "À déboucher."
-                    </Text>
-                  </View>
+                    {/* Signalement toilettes */}
+                    <View className="bg-gray-200 p-2 rounded-3xl mb-4 items-center flex-row gap-2">
+                      <View className="items-center">
+                        <Bath size={34} color="black" strokeWidth={1.5} />
+                      </View>
+                      <View>
+                        <Text className="font-bold">Toilettes</Text>
+                        <Text className="text-blue-500">
+                          52 avenue de la Marne
+                        </Text>
+                        <Text className="italic text-sm">"À déboucher."</Text>
+                      </View>
+                    </View>
                   </View>
                 </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
 
         {/* Modal des filtres */}
         <Modal
@@ -622,7 +633,9 @@ export default function Index() {
                   onPress={handleFilterApply}
                   className="w-36 h-10 items-center flex-1 justify-center bg-blue-500 rounded-full"
                 >
-                  <Text className="text-center text-xl text-white">Valider</Text>
+                  <Text className="text-center text-xl text-white">
+                    Valider
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -704,7 +717,13 @@ export default function Index() {
                 description={hydrant.Type}
                 onPress={() => {
                   setSelectedMarker({
-                    Type: <FireExtinguisher size={24} color="black" strokeWidth={2} />,
+                    Type: (
+                      <FireExtinguisher
+                        size={24}
+                        color="black"
+                        strokeWidth={2}
+                      />
+                    ),
                     description: hydrant.Type,
                     LIB_LEVEL: hydrant.object_name,
                     geo_point_2d: hydrant["Geo Point"],
@@ -775,12 +794,6 @@ export default function Index() {
               </Marker>
             ))}
         </MapView>
-        <TouchableOpacity
-        className="absolute top-20 right-5 p-3 bg-blue-500 rounded-full items-center"
-        onPress={handleProfilePress}
-      >
-        <UserRound size={24} color="white" />
-      </TouchableOpacity>
 
         {/* Bouton pour ouvrir la modal des filtres */}
         <TouchableOpacity
@@ -809,114 +822,155 @@ export default function Index() {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
           >
-            <TouchableWithoutFeedback onPress={() => {
-              setIsReportVisible(false);
-              resetForm();
-            }}>
-              <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-              <TouchableWithoutFeedback>
-                <View className="bg-white rounded-t-3xl p-4">
-                  {/* Titre avec croix pour fermer */}
-                  <View className="flex-row justify-between items-center mb-6">
-                    <Text className="text-center text-lg font-semibold">
-                      NOUVEAU SIGNALLEMENT
-                    </Text>
-                    <TouchableOpacity onPress={() => {
-                      setIsReportVisible(false);
-                      resetForm();
-                    }}>
-                      <X size={24} color="black" strokeWidth={2} />
-                    </TouchableOpacity>
-                  </View>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setIsReportVisible(false);
+                resetForm();
+              }}
+            >
+              <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                <TouchableWithoutFeedback>
+                  <View className="bg-white rounded-t-3xl p-4">
+                    {/* Titre avec croix pour fermer */}
+                    <View className="flex-row justify-between items-center mb-6">
+                      <Text className="text-center text-lg font-semibold">
+                        NOUVEAU SIGNALLEMENT
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setIsReportVisible(false);
+                          resetForm();
+                        }}
+                      >
+                        <X size={24} color="black" strokeWidth={2} />
+                      </TouchableOpacity>
+                    </View>
 
                     {selectedMarker && (
                       <>
-                      <View className="flex-row items-center bg-gray-100 p-4 rounded-lg mb-6">
-                        {/* Icône dynamique en fonction du type de marqueur */}
-                        {getIconByFilter()}
+                        <View className="flex-row items-center bg-gray-100 p-4 rounded-lg mb-6">
+                          {/* Icône dynamique en fonction du type de marqueur */}
+                          {getIconByFilter()}
 
-                        <View className="ml-3">
-                          <Text className="font-semibold">{selectedMarker.LIB_LEVEL}</Text>
-                          <Text className="text-blue-500">{selectedMarker.geo_point_2d}</Text>
+                          <View className="ml-3">
+                            <Text className="font-semibold">
+                              {selectedMarker.LIB_LEVEL}
+                            </Text>
+                            <Text className="text-blue-500">
+                              {selectedMarker.geo_point_2d}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
                       </>
                     )}
                     <TouchableOpacity
-                    className="flex-row justify-between items-center py-4 border-b border-gray-300"
-                    onPress={handleTypePress}
-                  >
-                    <RNPickerSelect
-                      onValueChange={setType} // Utilise setSelectedType
-                      placeholder={{ label: "Sélectionner un type...", value: null }}
-                      value={Type} // Ajoute la valeur sélectionnée ici
-                      items={[
-                        { label: "Sanitaire délabré", value: "Sanitaire délabré" },
-                        { label: "Abris bus cassé", value: "Abris bus cassé" },
-                        { label: "Banc inutilisable", value: "Banc inutilisable" },
-                        { label: "Poubelle dégradée", value: "Poubelle défradée" },
-                        { label: "Lumière défectueuse", value: "Lumière défectueuse" },
-                        { label: "Borne incendie endommagée", value: "Borne incendie endommagée" },
-                        { label: "Autre", value: "Autre" },
-                      ]}
-                      style={{
-                        inputIOS: {
-                          fontSize: 18,
-                        },
-                      }}
-                    />
-                    <Plus size={24} color="black" strokeWidth={2} />
-                  </TouchableOpacity>
+                      className="flex-row justify-between items-center py-4 border-b border-gray-300"
+                      onPress={handleTypePress}
+                    >
+                      <RNPickerSelect
+                        onValueChange={setType} // Utilise setSelectedType
+                        placeholder={{
+                          label: "Sélectionner un type...",
+                          value: null,
+                        }}
+                        value={Type} // Ajoute la valeur sélectionnée ici
+                        items={[
+                          {
+                            label: "Sanitaire délabré",
+                            value: "Sanitaire délabré",
+                          },
+                          {
+                            label: "Abris bus cassé",
+                            value: "Abris bus cassé",
+                          },
+                          {
+                            label: "Banc inutilisable",
+                            value: "Banc inutilisable",
+                          },
+                          {
+                            label: "Poubelle dégradée",
+                            value: "Poubelle défradée",
+                          },
+                          {
+                            label: "Lumière défectueuse",
+                            value: "Lumière défectueuse",
+                          },
+                          {
+                            label: "Borne incendie endommagée",
+                            value: "Borne incendie endommagée",
+                          },
+                          { label: "Autre", value: "Autre" },
+                        ]}
+                        style={{
+                          inputIOS: {
+                            fontSize: 18,
+                          },
+                        }}
+                      />
+                      <Plus size={24} color="black" strokeWidth={2} />
+                    </TouchableOpacity>
 
-                  {/* Champ de texte pour la description */}
-                  <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                  <View className="flex-row justify-between items-center py-4 border-b border-gray-300">
-                    <TextInput
-                      style={{
-                        fontSize: 18,
-                        flex: 1, // Remplir l'espace disponible
-                      }}
-                      value={Description} // Ajoute la valeur ici
-                      multiline
-                      numberOfLines={4}
-                      onChangeText={setSignDescription}
-                      placeholder="Ajouter une description ici"
-                      placeholderTextColor="rgba(0, 0, 0, 0.2)" // Définit la couleur du placeholder en gris
+                    {/* Champ de texte pour la description */}
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                      <View className="flex-row justify-between items-center py-4 border-b border-gray-300">
+                        <TextInput
+                          style={{
+                            fontSize: 18,
+                            flex: 1, // Remplir l'espace disponible
+                          }}
+                          value={Description} // Ajoute la valeur ici
+                          multiline
+                          numberOfLines={4}
+                          onChangeText={setSignDescription}
+                          placeholder="Ajouter une description ici"
+                          placeholderTextColor="rgba(0, 0, 0, 0.2)" // Définit la couleur du placeholder en gris
+                          onSubmitEditing={Keyboard.dismiss}
+                        />
+                        <Plus size={24} color="black" strokeWidth={2} />
+                      </View>
+                    </TouchableWithoutFeedback>
+                    <View className="mt-6">
+                      <Text className="text-lg mb-3">Photo</Text>
 
-                      onSubmitEditing={Keyboard.dismiss}
-                    />
-                    <Plus size={24} color="black" strokeWidth={2} />
-                  </View>
-                  </TouchableWithoutFeedback>
-                  <View className="mt-6">
-                    <Text className="text-lg mb-3">Photo</Text>
+                      <View className="flex-row justify-around">
+                        {/* Afficher les images sélectionnées */}
+                        {images.map((img, index) => (
+                          <Image
+                            key={index}
+                            source={{ uri: img }}
+                            style={{ width: 60, height: 60 }}
+                          />
+                        ))}
 
-                    <View className="flex-row justify-around">
-                      {/* Afficher les images sélectionnées */}
-                      {images.map((img, index) => (
-                        <Image key={index} source={{ uri: img }} style={{ width: 60, height: 60 }} />
-                      ))}
-
-                      {/* Afficher les carrés gris restants */}
-                      {[...Array(3 - images.length)].map((_, index) => (
-                        <TouchableOpacity key={index} onPress={handlePhotoPress} className="bg-gray-100 p-5 rounded-lg items-center justify-center">
-                          <ImagePlus size={24} color="black" strokeWidth={2} />
-                        </TouchableOpacity>
-                      ))}
+                        {/* Afficher les carrés gris restants */}
+                        {[...Array(3 - images.length)].map((_, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            onPress={handlePhotoPress}
+                            className="bg-gray-100 p-5 rounded-lg items-center justify-center"
+                          >
+                            <ImagePlus
+                              size={24}
+                              color="black"
+                              strokeWidth={2}
+                            />
+                          </TouchableOpacity>
+                        ))}
+                      </View>
                     </View>
-                  </View>
 
-
-                  {/* Bouton pour publier le signalement */}
-                  <TouchableOpacity
-                    onPress={() => {
-                      handleSubmit(); // Appelle la fonction pour fermer et réinitialiser la modale
-                      setIsReportVisible(false);
-                    }}
-                    className="bg-blue-500 py-4 rounded-full mt-10 mb-3"
-                  >
-                    <Text className="text-center text-white text-lg">Publier</Text>
-                  </TouchableOpacity>
+                    {/* Bouton pour publier le signalement */}
+                    <TouchableOpacity
+                      onPress={() => {
+                        handleSubmit(); // Appelle la fonction pour fermer et réinitialiser la modale
+                        setIsReportVisible(false);
+                      }}
+                      className="bg-blue-500 py-4 rounded-full mt-10 mb-3"
+                    >
+                      <Text className="text-center text-white text-lg">
+                        Publier
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </TouchableWithoutFeedback>
               </View>
@@ -924,40 +978,69 @@ export default function Index() {
           </KeyboardAvoidingView>
         </Modal>
 
-
-      <Modal
-        visible={isPhotoModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsPhotoModalVisible(false)}
-      >
-        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-          <View style={{ backgroundColor: 'white', padding: 20, borderTopLeftRadius: 20, borderTopRightRadius: 20, height: '40%' }}>
-            <TouchableOpacity onPress={handleBackToReport}>
-              <ArrowLeft size={24} color="black" />
-            </TouchableOpacity>
-            <Text className="text-center text-lg font-semibold mb-6">PHOTO</Text>
-
-            {/* Option pour ouvrir la galerie */}
-            <TouchableOpacity
-              onPress={pickImage}
-              className="flex-row items-center py-4 bg-gray-100 rounded-lg mb-3 px-3"
+        <Modal
+          visible={isPhotoModalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setIsPhotoModalVisible(false)}
+        >
+          <View style={{ flex: 1, justifyContent: "flex-end" }}>
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 20,
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                height: "40%",
+              }}
             >
-              <SquareArrowOutUpRight size={24} color="black" strokeWidth={2} />
-              <Text className="text-lg ml-3">Ouvrir depuis la Galerie</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={handleBackToReport}>
+                <ArrowLeft size={24} color="black" />
+              </TouchableOpacity>
+              <Text className="text-center text-lg font-semibold mb-6">
+                PHOTO
+              </Text>
 
-            {/* Option pour prendre une photo */}
-            <TouchableOpacity
-              onPress={takeImage}
-              className="flex-row items-center py-4 bg-gray-100 rounded-lg px-3"
-            >
-              <Aperture size={24} color="black" strokeWidth={2} />
-              <Text className="text-lg ml-3">Prendre une photo</Text>
-            </TouchableOpacity>
+              {/* Option pour ouvrir la galerie */}
+              <TouchableOpacity
+                onPress={pickImage}
+                className="flex-row items-center py-4 bg-gray-100 rounded-lg mb-3 px-3"
+              >
+                <SquareArrowOutUpRight
+                  size={24}
+                  color="black"
+                  strokeWidth={2}
+                />
+                <Text className="text-lg ml-3">Ouvrir depuis la Galerie</Text>
+              </TouchableOpacity>
+
+              {/* Option pour prendre une photo */}
+              <TouchableOpacity
+                onPress={takeImage}
+                className="flex-row items-center py-4 bg-gray-100 rounded-lg px-3"
+              >
+                <Aperture size={24} color="black" strokeWidth={2} />
+                <Text className="text-lg ml-3">Prendre une photo</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+        </Modal>
+        <View className="bg-white absolute p-2 w-[351px] rounded-full top-[80px] left-5 flex-row items-center">
+        {/* Button profile */}
+        <TouchableOpacity
+          className="absolute right-3 p-2 bg-blue-500 rounded-full items-center"
+          onPress={handleProfilePress}
+        >
+          <UserRound size={24} color="white" />
+        </TouchableOpacity>
+        {/* search bar */}
+        <Search size={24} color="gray" strokeWidth={2} className="ml-1" />
+          <TextInput
+            className="p-3"
+            placeholder="Recherche"
+            placeholderTextColor="gray"
+          />
         </View>
-      </Modal>
       </View>
     </KeyboardAvoidingView>
   );
