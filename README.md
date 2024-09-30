@@ -6,7 +6,7 @@ FixCity - Mobile app
 # FixCity - Application
 
 ## Description
-Ce projet permet de suivre et signaler des incidents en ville via une application mobile connectée à une base de données. L'application offre des fonctionnalités de filtrage des rapports d'incidents et permet aux utilisateurs de poster leurs propres signalements. Ce projet a été développé en collaboration avec [indiquez les noms des participants].
+Ce projet permet de suivre et signaler des incidents en ville via une application mobile connectée à une base de données. L'application offre des fonctionnalités de filtrage des rapports d'incidents et permet aux utilisateurs de poster leurs propres signalements.
 
 ## Prérequis
 
