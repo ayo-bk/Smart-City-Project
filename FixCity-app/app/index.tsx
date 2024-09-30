@@ -217,8 +217,8 @@ export default function Index() {
 
   // Fonction pour réinitialiser les champs après la publication
   const resetForm = () => {
-    setSelectedType(null); // Réinitialiser le type
-    setDescription(""); // Réinitialiser la description
+    setType([""]); // Réinitialiser le type
+    setSignDescription(""); // Réinitialiser la description
     setImages([]); // Réinitialiser les images
   };
 
@@ -838,8 +838,8 @@ export default function Index() {
                       </Text>
                       <TouchableOpacity
                         onPress={() => {
-                          setIsReportVisible(false);
                           resetForm();
+                          setIsReportVisible(false);
                         }}
                       >
                         <X size={24} color="black" strokeWidth={2} />
