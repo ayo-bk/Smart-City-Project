@@ -89,3 +89,4 @@ Ce projet a été réalisé par :
 - **Sacha Gaulin**
 - **Anna Nouvel**
 - **Ayodélé Bansou-Kpindé**
+- **Martin Pinaud**
